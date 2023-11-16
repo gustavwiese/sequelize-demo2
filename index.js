@@ -47,7 +47,7 @@ OrderItem.belongsTo(Product);
 // Sync the models with the database
 async function syncDatabase() {
   try {
-    await sequelize.sync({ alter: true }); // Use { force: true } to recreate tables on every app start
+    await sequelize.sync({ force: true }); // Use { force: true } to recreate tables on every app start
     console.log("Database synchronized");
   } catch (error) {
     console.error("Error syncing database:", error);
@@ -70,6 +70,11 @@ async function createSampleData() {
 
     const product2 = await Product.create({
       productName: "Product B",
+      price: 29.99,
+    });
+
+    await Product.create({
+      productName: "Product C",
       price: 29.99,
     });
 
@@ -112,8 +117,8 @@ app.get("/orders", async (req, res) => {
       ],
     });
 
-    // create a DTO
-    // const dto = orders.map((order) => {
+    //create a DTO
+    // const ordersDTO = orders.map((order) => {
     //   return {
     //     orderNumber: order.orderNumber,
     //     orderItems: order.OrderItems.map((orderItem) => {
@@ -128,9 +133,27 @@ app.get("/orders", async (req, res) => {
     //   };
     // });
 
-    //res.json(dto);
+    // res.json(ordersDTO);
 
     res.json(orders);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/products", async (req, res) => {
+  try {
+    const products = await Product.findAll({
+      include: [
+        {
+          model: OrderItem,
+          include: [Order],
+        },
+      ],
+    });
+
+    res.json(products);
   } catch (error) {
     console.error("Error fetching orders:", error);
     res.status(500).json({ error: "Internal Server Error" });
