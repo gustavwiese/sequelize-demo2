@@ -5,7 +5,7 @@ const app = express();
 const PORT = 3000;
 
 // Create a Sequelize instance
-const sequelize = new Sequelize("database2", "root", "123456", {
+const sequelize = new Sequelize("sequelize_db", "root", "kodeord1", {
   host: "localhost",
   dialect: "mysql",
 });
@@ -95,7 +95,7 @@ async function createSampleData() {
 // Middleware for syncing the database and running example functions
 app.use(async (req, res, next) => {
   await syncDatabase();
-  //await createSampleData();
+  await createSampleData();
   next();
 });
 
